@@ -1,0 +1,48 @@
+name: MobileGL Vulkan CI
+
+on:
+  push:
+    branches:
+      - "Feat/Backend-Direct-Vulkan"
+  pull_request:
+    branches:
+      - "Feat/Backend-Direct-Vulkan"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo + submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install minimal dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            clang \
+            cmake \
+            ninja-build \
+            vulkan-sdk
+
+      - name: Configure (CMake)
+        run: |
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DMOBILEGL_BUILD_TEST=OFF \
+            -DMOBILEGL_BUILD_BENCHMARK=OFF
+
+      - name: Build
+        run: |
+          cmake --build build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MobileGL-linux-vulkan
+          path: build/
+          
