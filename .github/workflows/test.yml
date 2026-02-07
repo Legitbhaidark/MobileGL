@@ -64,4 +64,14 @@ jobs:
             ctest -V
           else
             ctest
-          fi
+          fi     
+          
+          - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MobileGL-Build
+          path: ${{env.TEST_ROOT}}/build-test
+
+
+
+          
