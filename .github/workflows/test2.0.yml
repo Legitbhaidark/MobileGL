@@ -1,0 +1,49 @@
+name: MobileGL Vulkan Backend CI
+
+on:
+  push:
+    branches:
+      - "Feat/Backend-Direct-Vulkan"
+  pull_request:
+    branches:
+      - "Feat/Backend-Direct-Vulkan"
+
+jobs:
+  linux-vulkan:
+    name: Linux (Direct Vulkan backend)
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: Feat/Backend-Direct-Vulkan
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            clang \
+            lld \
+            ninja-build \
+            cmake \
+            python3 \
+            mesa-common-dev \
+            libgl1-mesa-dev \
+            vulkan-sdk
+
+      - name: Configure (Vulkan focus)
+        run: |
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER=clang \
+            -DCMAKE_CXX_COMPILER=clang++ \
+            -DMOBILEGL_BUILD_TEST=OFF \
+            -DMOBILEGL_BUILD_BENCHMARK=OFF
+
+      - name: Build
+        run: |
+          cmake --build build
+          
